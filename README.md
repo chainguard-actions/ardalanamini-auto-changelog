@@ -1,1 +1,15 @@
-# ardalanamini-auto-changelog
+# ardalanamini/auto-changelog
+
+Automatic Changelog generator
+
+Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at [https://github.com/ardalanamini/auto-changelog](https://github.com/ardalanamini/auto-changelog).
+
+## Versions
+
+| Version | Tag | Upstream commit |
+|---------|-----|-----------------|
+| v4.0.5 | [`v4.0.5`](https://github.com/chainguard-actions/ardalanamini-auto-changelog/tree/v4.0.5) | [`3a04523`](https://github.com/ardalanamini/auto-changelog/commit/3a04523f13f0808eb58324d02a0c4f5c984007ad) |
+
+## Privacy
+
+This Action contacts Chainguard's licensing server to verify authorization. Connection metadata (IP address, GitHub repository identifier, timestamp, and any metadata encoded in the auth token) is transmitted to Chainguard, Inc. even if authorization is denied in accordance with our [Privacy Notice](https://www.chainguard.dev/legal/privacy-notice)
