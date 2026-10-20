@@ -1,0 +1,54 @@
+name: Test Git API with semver disabled
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+      - name: Hide existing tags so no previous tag is picked up
+        run: |
+          # With semver disabled, any tag not on HEAD would be chosen as previous.
+          # Remove local tags so the result is deterministic.
+          git tag -l | xargs -r git tag -d >/dev/null
+          echo "remaining tags: $(git tag -l | wc -l)"
+      - id: action
+        uses: .
+        with:
+          preferred-api: Git
+          release-name: nightly-build
+          semver: 'false'
+          mention-new-contributors: 'false'
+          mention-authors: 'false'
+      - name: Assert prerelease is false
+        env:
+          ACTUAL: ${{ steps.action.outputs.prerelease }}
+        run: |
+          echo "actual: $ACTUAL"
+          if [ "$ACTUAL" != "false" ]; then
+            echo "FAIL: expected 'false'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert release-id is latest
+        env:
+          ACTUAL: ${{ steps.action.outputs.release-id }}
+        run: |
+          echo "actual: $ACTUAL"
+          if [ "$ACTUAL" != "latest" ]; then
+            echo "FAIL: expected 'latest'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert no compare link without a previous tag
+        env:
+          ACTUAL: ${{ steps.action.outputs.changelog }}
+        run: |
+          echo "actual: $ACTUAL"
+          if echo "$ACTUAL" | grep -q "Full Changelog"; then
+            echo "FAIL: did not expect a Full Changelog link"
+            exit 1
+          fi
+          echo "PASS"

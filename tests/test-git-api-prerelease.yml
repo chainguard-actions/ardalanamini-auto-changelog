@@ -1,0 +1,37 @@
+name: Test Git API prerelease
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+      - id: action
+        uses: .
+        with:
+          preferred-api: Git
+          release-name: v2.0.0-beta.1
+          mention-new-contributors: 'false'
+          mention-authors: 'false'
+      - name: Assert prerelease is true
+        env:
+          ACTUAL: ${{ steps.action.outputs.prerelease }}
+        run: |
+          echo "actual: $ACTUAL"
+          if [ "$ACTUAL" != "true" ]; then
+            echo "FAIL: expected 'true'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert release-id is beta
+        env:
+          ACTUAL: ${{ steps.action.outputs.release-id }}
+        run: |
+          echo "actual: $ACTUAL"
+          if [ "$ACTUAL" != "beta" ]; then
+            echo "FAIL: expected 'beta'"
+            exit 1
+          fi
+          echo "PASS"

@@ -1,0 +1,49 @@
+name: Test Git API stable release
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+      - id: action
+        uses: .
+        with:
+          preferred-api: Git
+          release-name: v1.0.0
+          mention-new-contributors: 'false'
+          mention-authors: 'false'
+      - name: Assert prerelease is false
+        env:
+          ACTUAL: ${{ steps.action.outputs.prerelease }}
+        run: |
+          echo "actual: $ACTUAL"
+          if [ "$ACTUAL" != "false" ]; then
+            echo "FAIL: expected 'false'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert release-id is latest
+        env:
+          ACTUAL: ${{ steps.action.outputs.release-id }}
+        run: |
+          echo "actual: $ACTUAL"
+          if [ "$ACTUAL" != "latest" ]; then
+            echo "FAIL: expected 'latest'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert package outputs are empty (not a monorepo package tag)
+        env:
+          NAME: ${{ steps.action.outputs.package-name }}
+          PKG_PATH: ${{ steps.action.outputs.package-path }}
+        run: |
+          echo "package-name: '$NAME'"
+          echo "package-path: '$PKG_PATH'"
+          if [ -n "$NAME" ] || [ -n "$PKG_PATH" ]; then
+            echo "FAIL: expected empty package outputs"
+            exit 1
+          fi
+          echo "PASS"
