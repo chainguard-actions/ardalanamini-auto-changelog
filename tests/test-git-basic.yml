@@ -1,0 +1,67 @@
+name: Test Git API basic stable release
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+      - id: action
+        uses: .
+        with:
+          preferred-api: Git
+          release-name: v999.0.0
+          mention-new-contributors: 'false'
+      - name: Assert prerelease is false
+        env:
+          ACTUAL: ${{ steps.action.outputs.prerelease }}
+        run: |
+          echo "actual: $ACTUAL"
+          if [ "$ACTUAL" != "false" ]; then
+            echo "FAIL: expected 'false'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert release-id is latest
+        env:
+          ACTUAL: ${{ steps.action.outputs.release-id }}
+        run: |
+          echo "actual: $ACTUAL"
+          if [ "$ACTUAL" != "latest" ]; then
+            echo "FAIL: expected 'latest'"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert action succeeded and changelog is well-formed
+        env:
+          ACTUAL: ${{ steps.action.outputs.changelog }}
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "actual: $ACTUAL"
+          if [ "$OUTCOME" != "success" ]; then
+            echo "FAIL: expected action to succeed"
+            exit 1
+          fi
+          if [ -n "$(echo "$ACTUAL" | tr -d '[:space:]')" ]; then
+            if ! echo "$ACTUAL" | grep -qE '^## |\*\*Full Changelog\*\*'; then
+              echo "FAIL: non-empty changelog has neither a section heading nor a compare link"
+              exit 1
+            fi
+          else
+            echo "changelog empty (no previous tag / commit range under harness)"
+          fi
+          echo "PASS"
+      - name: Assert package outputs are empty (no package mode)
+        env:
+          NAME: ${{ steps.action.outputs.package-name }}
+          PATH_OUT: ${{ steps.action.outputs.package-path }}
+        run: |
+          echo "package-name: '$NAME' package-path: '$PATH_OUT'"
+          if [ -n "$NAME" ] || [ -n "$PATH_OUT" ]; then
+            echo "FAIL: expected empty package outputs"
+            exit 1
+          fi
+          echo "PASS"

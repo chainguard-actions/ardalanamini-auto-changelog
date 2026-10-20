@@ -1,0 +1,51 @@
+name: Test Git API compare link with previous tag
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+      - name: Tag previous commit
+        run: |
+          git fetch --unshallow 2>/dev/null || true
+          if ! git rev-parse --verify HEAD~1 >/dev/null 2>&1; then
+            echo "FAIL: HEAD~1 not available"
+            exit 1
+          fi
+          git tag -f v998.0.0 HEAD~1
+          git log --oneline -3
+      - id: action
+        uses: .
+        with:
+          preferred-api: Git
+          release-name: v999.0.0
+          mention-new-contributors: 'false'
+          include-compare-link: 'true'
+          use-github-autolink: 'true'
+      - name: Assert compare link present
+        env:
+          ACTUAL: ${{ steps.action.outputs.changelog }}
+        run: |
+          echo "actual: $ACTUAL"
+          if ! echo "$ACTUAL" | grep -q '\*\*Full Changelog\*\*: .*/compare/v998.0.0...v999.0.0'; then
+            echo "FAIL: expected compare link v998.0.0...v999.0.0"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert compare link appears exactly once
+        env:
+          ACTUAL: ${{ steps.action.outputs.changelog }}
+        run: |
+          COUNT="$(echo "$ACTUAL" | grep -c 'Full Changelog' || true)"
+          echo "count: $COUNT"
+          if [ "$COUNT" != "1" ]; then
+            echo "FAIL: expected exactly one Full Changelog line"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Cleanup tag
+        if: always()
+        run: git tag -d v998.0.0 || true

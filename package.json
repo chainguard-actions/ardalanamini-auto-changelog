@@ -1,0 +1,80 @@
+{
+  "name": "auto-changelog",
+  "version": "4.1.1",
+  "private": true,
+  "description": "Github Automatic Changelog action",
+  "author": {
+    "name": "Ardalan Amini",
+    "email": "ardalanamini22@gmail.com",
+    "url": "https://ardalanamini.com"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/marketplace/actions/auto-changelog",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ardalanamini/auto-changelog.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ardalanamini/auto-changelog/issues"
+  },
+  "keywords": [
+    "actions",
+    "changelog"
+  ],
+  "engines": {
+    "node": ">= 24"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "imports": {
+    "#constants": "./src/constants/index.ts",
+    "#apis": "./src/apis/index.ts",
+    "#monorepo": "./src/monorepo/index.ts",
+    "#nodes": "./src/nodes/index.ts",
+    "#inputs": "./src/inputs/index.ts",
+    "#outputs": "./src/outputs/index.ts",
+    "#utils": "./src/utils/index.ts",
+    "#utils/*": "./src/utils/*.ts"
+  },
+  "scripts": {
+    "prepare": "is-ci || husky",
+    "lint": "eslint --cache --cache-location ./.cache/eslint/ .",
+    "lint:fix": "pnpm lint --fix",
+    "build": "rolldown -c rolldown.config.mts",
+    "build:watch": "pnpm build --watch",
+    "bundle": "pnpm lint:fix && pnpm build",
+    "test": "node --expose-gc --experimental-vm-modules node_modules/jest/bin/jest -c jest.config.ts",
+    "test:coverage": "pnpm test --coverage",
+    "test:types": "tsc -p ./tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@actions/core": "3.0.1",
+    "@actions/github": "9.1.1",
+    "marked": "18.0.3",
+    "semver": "7.8.0",
+    "yaml": "2.9.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "21.0.1",
+    "@commitlint/config-conventional": "21.0.1",
+    "@commitlint/types": "21.0.1",
+    "@eslint/compat": "2.1.0",
+    "@jest/globals": "30.4.1",
+    "@swc/core": "1.15.33",
+    "@swc/jest": "0.2.39",
+    "@types/jest": "30.0.0",
+    "@types/node": "25.8.0",
+    "@types/semver": "7.7.1",
+    "eslint": "10.4.0",
+    "eslint-config-flat-gitignore": "2.3.0",
+    "eslint-config-noir": "3.4.0",
+    "fetch-mock": "12.6.0",
+    "husky": "9.1.7",
+    "is-ci": "4.1.0",
+    "jest": "30.4.2",
+    "jiti": "2.7.0",
+    "rolldown": "1.0.1",
+    "ts-node": "10.9.2",
+    "typescript": "6.0.3"
+  }
+}
