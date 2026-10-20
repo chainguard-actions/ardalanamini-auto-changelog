@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "tsBuildInfoFile": "./.cache/typescript/tsconfig.build.tsbuildinfo"
+  },
+  "exclude": [
+    "commitlint.config.cts",
+    "eslint.config.mts",
+    "rolldown.config.mts",
+    "jest.config.ts",
+    "tests",
+    "action",
+    "__mocks__"
+  ]
+}
